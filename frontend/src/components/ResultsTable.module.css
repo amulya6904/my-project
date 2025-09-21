@@ -1,0 +1,211 @@
+.resultsContainer {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.resultsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #eee;
+  background: #f8f9fa;
+}
+
+.resultsInfo h3 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-weight: 600;
+}
+
+.summary {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+
+.bankName {
+  color: #007bff;
+  font-weight: 500;
+}
+
+.transactionCount {
+  color: #666;
+}
+
+.downloadBtn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.downloadBtn:hover {
+  background: #218838;
+}
+
+.tableContainer {
+  overflow-x: auto;
+}
+
+.resultsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.resultsTable th {
+  background: #f1f3f4;
+  padding: 1rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #ddd;
+  white-space: nowrap;
+}
+
+.resultsTable th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.resultsTable th.sortable:hover {
+  background: #e8eaed;
+}
+
+.resultsTable th.amount {
+  text-align: right;
+}
+
+.resultsTable td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+  max-width: 200px;
+}
+
+.resultsTable td.amount {
+  text-align: right;
+  font-family: 'Courier New', monospace;
+  font-weight: 500;
+}
+
+.resultsTable td.debit {
+  color: #dc3545;
+}
+
+.resultsTable td.credit {
+  color: #28a745;
+}
+
+.resultsTable td.balance {
+  color: #333;
+  font-weight: 600;
+}
+
+.resultsTable td.description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.resultsTable td.date {
+  white-space: nowrap;
+}
+
+.resultsTable td.reference {
+  font-size: 0.9rem;
+  color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 150px;
+}
+
+.typeBadge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.typeBadge.upi {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.typeBadge.transfer {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.typeBadge.deposit {
+  background: #e8f5e8;
+  color: #388e3c;
+}
+
+.typeBadge.withdrawal {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+.typeBadge.fee {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.pagination button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.pagination button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .resultsHeader {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .resultsTable {
+    font-size: 0.9rem;
+  }
+
+  .resultsTable th,
+  .resultsTable td {
+    padding: 0.5rem 0.25rem;
+  }
+}

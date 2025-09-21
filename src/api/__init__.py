@@ -1,0 +1,1 @@
+"""FastAPI web application for bank statement processing."""

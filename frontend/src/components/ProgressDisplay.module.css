@@ -1,0 +1,102 @@
+.progressContainer {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.statusHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.statusIcon {
+  font-size: 1.5rem;
+}
+
+.statusHeader h3 {
+  margin: 0;
+  color: #333;
+  font-weight: 600;
+}
+
+.progressSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.progressBarContainer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.progressBar {
+  flex: 1;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.progressText {
+  font-weight: 600;
+  color: #333;
+  min-width: 40px;
+}
+
+.statusMessage {
+  font-size: 0.9rem;
+  color: #666;
+  text-align: center;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.connectionStatus {
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.connectionStatus .connected {
+  color: #28a745;
+}
+
+.connectionStatus .disconnected {
+  color: #ffc107;
+}
+
+.connectionStatus .error {
+  color: #dc3545;
+}
+
+.processingAnimation {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

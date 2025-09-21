@@ -1,0 +1,530 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Simplified App Styles */
+.header {
+  text-align: center;
+  padding: 2rem 0;
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.header p {
+  margin: 0;
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.main {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  width: 100%;
+}
+
+.uploadForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.fileInput, .passwordInput {
+  padding: 0.75rem;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.fileInput:hover, .passwordInput:focus {
+  border-color: #667eea;
+}
+
+.fileInfo {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.uploadButton, .downloadButton, .resetButton {
+  padding: 0.75rem 2rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.uploadButton:hover, .downloadButton:hover, .resetButton:hover {
+  background: #5a67d8;
+}
+
+.uploadButton:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.supportedBanks {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.supportedBanks h3 {
+  margin: 0 0 0.5rem 0;
+  color: #666;
+}
+
+.supportedBanks ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.supportedBanks li {
+  padding: 0.25rem 0;
+  color: #888;
+}
+
+.processingSpinner {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.errorSection, .resultsSection {
+  text-align: center;
+}
+
+.errorDetails {
+  text-align: left;
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #dc3545;
+  margin: 1rem 0;
+}
+
+.resultsSummary {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #28a745;
+  margin: 1rem 0;
+  text-align: left;
+}
+
+.transactionsTable {
+  margin: 2rem 0;
+}
+
+.tableContainer {
+  overflow-x: auto;
+  max-height: 400px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.tableContainer table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tableContainer th {
+  background: #f8f9fa;
+  padding: 0.75rem 0.5rem;
+  text-align: left;
+  border-bottom: 2px solid #ddd;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.tableContainer td {
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.descriptionCell {
+  max-width: 200px;
+}
+
+.counterparty {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.debitCell {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.creditCell {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.typeCell {
+  background: #e9ecef;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.downloadButton {
+  background: #28a745;
+}
+
+.downloadButton:hover {
+  background: #218838;
+}
+
+.resetButton {
+  background: #6c757d;
+}
+
+.resetButton:hover {
+  background: #5a6268;
+}
+
+.appHeader {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 2rem 0;
+  text-align: center;
+  color: white;
+}
+
+.appHeader h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.appHeader p {
+  margin: 0;
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.appMain {
+  flex: 1;
+  padding: 2rem 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.progressSteps {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 3rem;
+  gap: 2rem;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+.step.active {
+  color: #ffd700;
+}
+
+.step.completed {
+  color: #90ee90;
+}
+
+.stepNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  font-weight: 600;
+}
+
+.step.active .stepNumber {
+  background: #ffd700;
+  color: #333;
+}
+
+.step.completed .stepNumber {
+  background: #90ee90;
+  color: #333;
+}
+
+.errorState {
+  text-align: center;
+  background: white;
+  border-radius: 8px;
+  padding: 3rem 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.errorIcon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.errorState h3 {
+  color: #dc3545;
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+}
+
+.errorState p {
+  color: #666;
+  margin: 0 0 2rem 0;
+  line-height: 1.6;
+}
+
+.retryButton,
+.startOverBtn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.retryButton:hover,
+.startOverBtn:hover {
+  background: #0056b3;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.startOverBtn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  backdrop-filter: blur(10px);
+}
+
+.startOverBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.appFooter {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 1rem 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.appFooter p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .appHeader h1 {
+    font-size: 2rem;
+  }
+
+  .appHeader p {
+    font-size: 1rem;
+  }
+
+  .progressSteps {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .step {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* AI Analysis Styles */
+.aiAnalysisSection {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  color: white;
+}
+
+.analyzeButton {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.analyzeButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+}
+
+.analyzeButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.aiSummary {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.aiSummary h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.topCategories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  align-items: center;
+}
+
+.categoryTag {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Transaction Table AI Category Styles */
+.categoryCell {
+  min-width: 150px;
+}
+
+.aiCategoryContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.categoryBadge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  cursor: help;
+  transition: all 0.2s ease;
+}
+
+.categoryBadge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.confidenceBadge {
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  background: #f0f0f0;
+  border-radius: 8px;
+  color: #666;
+  font-weight: 500;
+}
+
+.originalType {
+  color: #666;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* Responsive adjustments for AI features */
+@media (max-width: 768px) {
+  .aiAnalysisSection {
+    margin: 1rem 0;
+    padding: 0.75rem;
+  }
+
+  .topCategories {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .aiCategoryContainer {
+    align-items: center;
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "transactions": [
+    {
+      "id": "txn_0",
+      "description": "SWIGGY FOOD DELIVERY BANGALORE",
+      "amount": -250.00,
+      "transaction_type": "UPI",
+      "date": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "txn_1",
+      "description": "UBER CAB RIDE TO AIRPORT",
+      "amount": -380.00,
+      "transaction_type": "UPI",
+      "date": "2024-01-02T00:00:00Z"
+    },
+    {
+      "id": "txn_2",
+      "description": "AMAZON SHOPPING ELECTRONICS",
+      "amount": -1200.00,
+      "transaction_type": "CARD",
+      "date": "2024-01-03T00:00:00Z"
+    }
+  ],
+  "provider": "mock"
+}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { simpleApiService, ProcessingResult, Transaction, AnalyzeResponse } from './services/simpleApi';
 import styles from './App.module.css';
+import Report from './components/Report';
 
 enum AppState {
   UPLOAD = 'upload',
@@ -19,6 +20,7 @@ const SimpleApp: React.FC = () => {
   // AI Analysis state
   const [aiAnalysis, setAiAnalysis] = useState<AnalyzeResponse | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const [showReport, setShowReport] = useState<boolean>(false);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -64,6 +66,7 @@ const SimpleApp: React.FC = () => {
     setPassword('');
     setAiAnalysis(null);
     setIsAnalyzing(false);
+    setShowReport(false);
   };
 
   const handleAnalyzeWithAI = async (provider: string = 'mock') => {
@@ -271,6 +274,18 @@ const SimpleApp: React.FC = () => {
                         </span>
                       ))}
                     </div>
+                  </div>
+                )}
+                <button
+                  onClick={() => setShowReport((prev) => !prev)}
+                  disabled={!results.transactions?.length}
+                  className={styles.analyzeButton}
+                >
+                  {showReport ? 'Hide Analysis Report' : 'View Analysis Report'}
+                </button>
+                {showReport && results.transactions && (
+                  <div className={styles.reportContainer}>
+                    <Report transactions={results.transactions} />
                   </div>
                 )}
               </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { simpleApiService, ProcessingResult, Transaction, AnalyzeResponse } from './services/simpleApi';
+import AnalysisReportModal from './components/AnalysisReportModal';
 import styles from './App.module.css';
 
 enum AppState {
@@ -19,6 +20,7 @@ const SimpleApp: React.FC = () => {
   // AI Analysis state
   const [aiAnalysis, setAiAnalysis] = useState<AnalyzeResponse | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const [isReportOpen, setIsReportOpen] = useState<boolean>(false);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -64,6 +66,7 @@ const SimpleApp: React.FC = () => {
     setPassword('');
     setAiAnalysis(null);
     setIsAnalyzing(false);
+    setIsReportOpen(false);
   };
 
   const handleAnalyzeWithAI = async (provider: string = 'mock') => {
@@ -237,8 +240,8 @@ const SimpleApp: React.FC = () => {
           </div>
         )}
 
-        {appState === AppState.RESULTS && results?.success && results.transactions && (
-          <div className={styles.resultsSection}>
+      {appState === AppState.RESULTS && results?.success && results.transactions && (
+        <div className={styles.resultsSection}>
             <div className={styles.card}>
               <h2>✅ Processing Complete!</h2>
               <div className={styles.resultsSummary}>
@@ -273,6 +276,19 @@ const SimpleApp: React.FC = () => {
                     </div>
                   </div>
                 )}
+                <div className="mt-4 rounded-lg border border-slate-200 bg-white/70 p-4 shadow-sm">
+                  <h5 className="text-sm font-semibold text-slate-700">Need a deeper dive?</h5>
+                  <p className="mt-1 text-xs text-slate-500">
+                    View charts and AI-generated insights summarizing your spending habits.
+                  </p>
+                  <button
+                    onClick={() => setIsReportOpen(true)}
+                    disabled={!results.transactions?.length}
+                    className="mt-3 inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300"
+                  >
+                    📊 Analysis Report
+                  </button>
+                </div>
               </div>
 
               <div className={styles.transactionsTable}>
@@ -355,6 +371,15 @@ const SimpleApp: React.FC = () => {
           </div>
         )}
       </main>
+
+      {appState === AppState.RESULTS && (
+        <AnalysisReportModal
+          isOpen={isReportOpen}
+          onClose={() => setIsReportOpen(false)}
+          transactions={results?.transactions || []}
+          aiAnalysis={aiAnalysis}
+        />
+      )}
     </div>
   );
 };

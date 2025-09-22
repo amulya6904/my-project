@@ -36,6 +36,12 @@ export interface AnalyzeRequest {
   provider?: string;
 }
 
+export interface InsightSummary {
+  pros: string[];
+  cons: string[];
+  recommendations: string[];
+}
+
 export interface AnalyzeResponse {
   success: boolean;
   categories: { [key: string]: CategoryResult };
@@ -50,6 +56,7 @@ export interface AnalyzeResponse {
     }>;
     provider_used: string;
   };
+  insights?: InsightSummary;
   error?: string;
 }
 

@@ -33,36 +33,35 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -e .
-        pip install -r requirements-dev.txt
+        pip install -e .[dev]
 
     - name: Lint with flake8
       run: |
         # Stop the build if there are Python syntax errors or undefined names
-        flake8 bank_statement_processor --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 src --count --select=E9,F63,F7,F82 --show-source --statistics
         # Exit-zero treats all errors as warnings
-        flake8 bank_statement_processor --count --exit-zero --max-complexity=10 --max-line-length=100 --statistics
+        flake8 src --count --exit-zero --max-complexity=10 --max-line-length=100 --statistics
 
     - name: Format check with black
       run: |
-        black --check bank_statement_processor/
+        black --check src/
 
     - name: Import sorting check with isort
       run: |
-        isort --check-only --diff bank_statement_processor/
+        isort --check-only --diff src/
 
     - name: Type checking with mypy
       run: |
-        mypy bank_statement_processor/
+        mypy src/
 
     - name: Security check with bandit
       run: |
-        bandit -r bank_statement_processor/ -f json -o bandit-report.json || true
-        bandit -r bank_statement_processor/ -ll
+        bandit -r src/ -f json -o bandit-report.json || true
+        bandit -r src/ -ll
 
     - name: Run tests with pytest
       run: |
-        pytest --cov=bank_statement_processor --cov-report=xml --cov-report=html --cov-fail-under=80 -v
+        pytest --cov=src --cov-report=xml --cov-report=html --cov-fail-under=80 -v
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
@@ -129,8 +128,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -e .
-        pip install -r requirements-dev.txt
+        pip install -e .[dev]
 
     - name: Run integration tests
       run: |
@@ -139,10 +137,10 @@ jobs:
     - name: Test CLI commands
       run: |
         # Test CLI help commands
-        bank-processor --help
-        bank-processor process --help
-        bank-processor batch --help
-        bank-processor detect --help
+        bank-statement-processor --help
+        bank-statement-processor process --help
+        bank-statement-processor batch --help
+        bank-statement-processor detect --help
 
   performance-test:
     runs-on: ubuntu-latest
@@ -201,8 +199,8 @@ jobs:
 
     - name: Security analysis with bandit
       run: |
-        bandit -r bank_statement_processor/ -f json -o bandit-security.json || true
-        bandit -r bank_statement_processor/
+        bandit -r src/ -f json -o bandit-security.json || true
+        bandit -r src/
 
     - name: Upload security reports
       uses: actions/upload-artifact@v3

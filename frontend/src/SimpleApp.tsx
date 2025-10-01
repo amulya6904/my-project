@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { simpleApiService, ProcessingResult, Transaction, AnalyzeResponse } from './services/simpleApi';
 import styles from './App.module.css';
-import Report from './components/Report';
 
 enum AppState {
   UPLOAD = 'upload',
@@ -20,7 +20,7 @@ const SimpleApp: React.FC = () => {
   // AI Analysis state
   const [aiAnalysis, setAiAnalysis] = useState<AnalyzeResponse | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
-  const [showReport, setShowReport] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -66,7 +66,21 @@ const SimpleApp: React.FC = () => {
     setPassword('');
     setAiAnalysis(null);
     setIsAnalyzing(false);
-    setShowReport(false);
+  };
+
+  const handleOpenReport = () => {
+    if (!results?.transactions || results.transactions.length === 0) {
+      alert('No transactions available for the report');
+      return;
+    }
+
+    navigate('/report', {
+      state: {
+        transactions: results.transactions,
+        aiSummary: aiAnalysis?.summary,
+        aiCategories: aiAnalysis?.categories
+      }
+    });
   };
 
   const handleAnalyzeWithAI = async (provider: string = 'mock') => {
@@ -277,17 +291,12 @@ const SimpleApp: React.FC = () => {
                   </div>
                 )}
                 <button
-                  onClick={() => setShowReport((prev) => !prev)}
+                  onClick={handleOpenReport}
                   disabled={!results.transactions?.length}
                   className={styles.analyzeButton}
                 >
-                  {showReport ? 'Hide Analysis Report' : 'View Analysis Report'}
+                  📊 Analysis Report
                 </button>
-                {showReport && results.transactions && (
-                  <div className={styles.reportContainer}>
-                    <Report transactions={results.transactions} />
-                  </div>
-                )}
               </div>
 
               <div className={styles.transactionsTable}>

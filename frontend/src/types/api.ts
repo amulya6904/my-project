@@ -10,6 +10,7 @@ export interface UploadResponse {
   filename: string;
   size: number;
   status: JobStatus;
+  error?: string;
 }
 
 export interface JobStatusResponse {

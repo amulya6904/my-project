@@ -297,6 +297,9 @@ async def upload_file(
 
         logger.info(f"File uploaded successfully: {job_id}, size: {file_size}")
 
+        job_status = JobStatus.COMPLETED
+        error_message: Optional[str] = None
+
         # IMMEDIATELY PROCESS THE PDF using the working CLI parsers
         try:
             # Import the working parser - fix the import path
@@ -310,9 +313,12 @@ async def upload_file(
             bank_name = parser.bank_name if hasattr(parser, 'bank_name') else "Unknown"
 
             # Update job with processing results
-            job_manager.update_progress(job_id, 100,
-                                      f"Successfully processed {len(transactions)} transactions",
-                                      JobStatus.COMPLETED)
+            job_manager.update_progress(
+                job_id,
+                100,
+                f"Successfully processed {len(transactions)} transactions",
+                JobStatus.COMPLETED
+            )
 
             # Store transaction data in job
             job = job_manager.get_job(job_id)
@@ -337,18 +343,32 @@ async def upload_file(
             logger.info(f"Successfully processed {file.filename}: {len(transactions)} transactions from {bank_name}")
 
         except Exception as parse_error:
-            # If parsing fails, still return successful upload but mark job as failed
             logger.error(f"Failed to process PDF {file.filename}: {str(parse_error)}")
-            job_manager.update_progress(job_id, 0, f"Processing failed: {str(parse_error)}", JobStatus.FAILED)
+            error_message = f"Processing failed: {str(parse_error)}"
+            job_status = JobStatus.FAILED
+            job_manager.update_progress(job_id, 0, error_message, JobStatus.FAILED)
+
+            job = job_manager.get_job(job_id)
+            if job is not None:
+                job['error'] = error_message
 
         # Clean up temp file
         os.unlink(temp_file_path)
+
+        if job_status == JobStatus.FAILED:
+            return UploadResponse(
+                job_id=job_id,
+                filename=file.filename,
+                size=file_size,
+                status=job_status,
+                error=error_message
+            )
 
         return UploadResponse(
             job_id=job_id,
             filename=file.filename,
             size=file_size,
-            status=JobStatus.COMPLETED  # Return completed since we processed immediately
+            status=job_status
         )
 
     except Exception as e:

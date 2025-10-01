@@ -20,6 +20,7 @@ class UploadResponse(BaseModel):
     filename: str = Field(..., description="Original filename")
     size: int = Field(..., description="File size in bytes")
     status: JobStatus = Field(default=JobStatus.PENDING)
+    error: Optional[str] = Field(None, description="Error message if processing failed")
 
 
 class JobStatusResponse(BaseModel):

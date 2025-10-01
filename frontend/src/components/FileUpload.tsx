@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { apiService } from '../services/api';
-import { UploadResponse } from '../types/api';
+import { UploadResponse, JobStatus } from '../types/api';
 import styles from './FileUpload.module.css';
 
 interface FileUploadProps {
@@ -45,6 +45,13 @@ const FileUpload: React.FC<FileUploadProps> = ({ onUploadSuccess, onError, disab
       }
 
       const response = await apiService.uploadFile(file);
+
+      if (response.status !== JobStatus.COMPLETED) {
+        const errorMessage = response.error || 'Processing failed. Please try another statement.';
+        onError(errorMessage);
+        return;
+      }
+
       onUploadSuccess(response);
     } catch (error: any) {
       onError(error.message || 'Upload failed');

@@ -6,7 +6,6 @@ import os
 import tempfile
 from datetime import datetime
 from typing import Dict, Optional, Any
-from pathlib import Path
 import logging
 
 from .models import JobStatus, ProgressUpdate
@@ -23,8 +22,8 @@ class JobManager:
     """Manages processing jobs and their lifecycle."""
     
     def __init__(self):
-        self.processor = BankStatementProcessor()
         self.temp_dir = tempfile.mkdtemp(prefix="bank_processor_")
+        self.processor = BankStatementProcessor(output_dir=self.temp_dir)
     
     def create_job(self, filename: str, file_size: int) -> str:
         """Create a new job entry."""
@@ -43,6 +42,7 @@ class JobManager:
             'transactions': [],
             'csv_path': None,
             'bank_name': '',
+            'account_number': None,
             'processing_time': None
         }
         
@@ -106,7 +106,9 @@ class JobManager:
                 csv_path = await loop.run_in_executor(
                     None,
                     self.processor.export_to_csv,
-                    result['transactions']
+                    result['transactions'],
+                    result['bank'],
+                    result.get('account_number')
                 )
                 
                 # Update job with results
@@ -118,9 +120,10 @@ class JobManager:
                     'progress': 100,
                     'message': f'Processing completed. Found {result["count"]} transactions.',
                     'completed_at': end_time,
-                    'transactions': result['transactions'],
+                    'transactions': result['transactions_data'],
                     'csv_path': csv_path,
                     'bank_name': result['bank'],
+                    'account_number': result.get('account_number'),
                     'processing_time': processing_time
                 })
                 
@@ -130,6 +133,8 @@ class JobManager:
                 jobs[job_id].update({
                     'status': JobStatus.FAILED,
                     'error': result.get('error', 'Processing failed'),
+                    'error_type': result.get('error_type'),
+                    'error_details': result.get('details'),
                     'completed_at': datetime.utcnow()
                 })
                 self.update_progress(job_id, 0, "Processing failed", JobStatus.FAILED)
@@ -157,13 +162,18 @@ class JobManager:
             self.update_progress(job_id, 30, "Reading PDF file...")
             
             result = self.processor.process_pdf(pdf_path, password)
-            
-            self.update_progress(job_id, 70, f"Extracted {result['count']} transactions...")
-            
+
+            if result.get('status') == 'success':
+                self.update_progress(job_id, 70, f"Extracted {result['count']} transactions...")
+
             return result
-            
+
         except Exception as e:
-            return {'status': 'error', 'error': str(e)}
+            return {
+                'status': 'error',
+                'error': str(e),
+                'error_type': e.__class__.__name__,
+            }
     
     def add_progress_callback(self, job_id: str, callback):
         """Add a WebSocket callback for progress updates."""

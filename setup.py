@@ -37,17 +37,19 @@ setup(
     install_requires=requirements,
     extras_require={
         "dev": [
+            "bandit>=1.7.0",
             "black>=23.0.0",
-            "flake8>=6.0.0", 
-            "mypy>=1.0.0",
+            "flake8>=6.0.0",
             "isort>=5.0.0",
+            "mypy>=1.0.0",
             "pytest>=7.0.0",
             "pytest-cov>=4.0.0",
+            "safety>=2.0.0",
         ],
     },
     entry_points={
         "console_scripts": [
-            "bank-statement-processor=src.cli:main",
+            "bank-statement-processor=src.main:cli",
         ],
     },
     include_package_data=True,

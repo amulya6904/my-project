@@ -53,6 +53,12 @@ export interface AnalyzeResponse {
   error?: string;
 }
 
+export interface TextSummaryResponse {
+  totalIncome: number;
+  totalExpenditure: number;
+  suggestions: string;
+}
+
 export interface ProcessingResult {
   success: boolean;
   filename?: string;
@@ -163,6 +169,69 @@ class SimpleApiService {
         categories: {},
         error: 'Failed to analyze transactions'
       };
+    }
+  }
+
+  async generateTextSummary(transactions: Transaction[], provider: string = 'mock'): Promise<TextSummaryResponse> {
+    try {
+      // Compute totals and category breakdown from the same dataset used across the UI
+      const toNumber = (v: number | string | null | undefined): number => {
+        if (v === null || v === undefined) return 0;
+        if (typeof v === 'number') return isFinite(v) ? v : 0;
+        if (typeof v === 'string') {
+          const parsed = parseFloat(v.replace(/[,\s]/g, ''));
+          return isNaN(parsed) ? 0 : parsed;
+        }
+        return 0;
+      };
+
+      let totalIncome = 0;
+      let totalExpenditure = 0;
+      const categoryAccumulator: Record<string, number> = {};
+
+      transactions.forEach((t) => {
+        const debit = Math.max(0, toNumber(t.debit as any));
+        const credit = Math.max(0, toNumber(t.credit as any));
+        const category = (t.ai_category || (t as any).category || 'Others') as string;
+
+        // Income is positive inflow (credits)
+        totalIncome += credit;
+
+        // Expenditure is outflow (debits)
+        totalExpenditure += debit;
+
+        // Track category-wise spend (expenditure only)
+        if (debit > 0) {
+          categoryAccumulator[category] = (categoryAccumulator[category] || 0) + debit;
+        }
+      });
+
+      const payload = {
+        provider,
+        totals: {
+          total_income: Math.round((totalIncome + Number.EPSILON) * 100) / 100,
+          total_expenditure: Math.round((totalExpenditure + Number.EPSILON) * 100) / 100,
+          potential_savings:
+            Math.round(((totalIncome - totalExpenditure) + Number.EPSILON) * 100) / 100,
+        },
+        category_breakdown: categoryAccumulator,
+        // Also include light transaction sample (optional) for additional context
+        transactions: transactions.map((t) => ({
+          date: t.date,
+          debit: t.debit,
+          credit: t.credit,
+          category: t.ai_category || (t as any).category || null,
+          description: t.description,
+        })),
+      };
+
+      const response = await axios.post<TextSummaryResponse>('/analyze/summary', payload, {
+        timeout: 60000
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error('LLM summary generation failed:', error);
+      throw error;
     }
   }
 }

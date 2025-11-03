@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { simpleApiService, ProcessingResult, Transaction, AnalyzeResponse } from './services/simpleApi';
+import { simpleApiService, ProcessingResult, Transaction, AnalyzeResponse, TextSummaryResponse } from './services/simpleApi';
 import styles from './App.module.css';
 
 enum AppState {
@@ -19,6 +19,8 @@ const SimpleApp: React.FC = () => {
   // AI Analysis state
   const [aiAnalysis, setAiAnalysis] = useState<AnalyzeResponse | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const [aiTextSummary, setAiTextSummary] = useState<TextSummaryResponse | null>(null);
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState<boolean>(false);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -95,10 +97,23 @@ const SimpleApp: React.FC = () => {
           return txn;
         });
 
-        setResults({
+        const nextResults = {
           ...results,
           transactions: updatedTransactions
-        });
+        };
+        setResults(nextResults);
+
+        // Generate textual summary using LLM endpoint
+        setIsGeneratingSummary(true);
+        let summary = null as any;
+        try {
+          summary = await simpleApiService.generateTextSummary(updatedTransactions, provider);
+          setAiTextSummary(summary);
+        } catch (e) {
+          console.error('Failed to generate text summary', e);
+        } finally {
+          setIsGeneratingSummary(false);
+        }
       } else {
         alert(`AI Analysis failed: ${analysis.error}`);
       }
@@ -271,6 +286,17 @@ const SimpleApp: React.FC = () => {
                         </span>
                       ))}
                     </div>
+                    {aiTextSummary && (
+                      <div className={styles.aiSummary}>
+                        <h4>LLM Summary</h4>
+                        <p><strong>Total Income:</strong> {formatCurrency(aiTextSummary.totalIncome)}</p>
+                        <p><strong>Total Expenditure:</strong> {formatCurrency(aiTextSummary.totalExpenditure)}</p>
+                        <p><strong>AI Suggestions:</strong> {aiTextSummary.suggestions}</p>
+                      </div>
+                    )}
+                    {isGeneratingSummary && (
+                      <p>Generating summary...</p>
+                    )}
                   </div>
                 )}
               </div>

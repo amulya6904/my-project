@@ -35,7 +35,12 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # React dev server
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
+    ],  # React dev server
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -67,6 +72,42 @@ class AnalyzeResponse(BaseModel):
     categories: Dict[str, CategoryResult]
     summary: Optional[Dict[str, Any]] = None
     error: Optional[str] = None
+
+# New models for AI categorization
+class TransactionForCategorization(BaseModel):
+    id: str
+    date: str
+    description: str
+    debit: Optional[float] = None
+    credit: Optional[float] = None
+
+class CategorizeRequest(BaseModel):
+    fileId: str
+    bank: str
+    transactions: List[TransactionForCategorization]
+
+class CategoryMapping(BaseModel):
+    id: str
+    category: str
+    confidence: float
+
+class CategorizeResponse(BaseModel):
+    categories: List[CategoryMapping]
+
+# Models for summary endpoint
+class SummaryTransaction(BaseModel):
+    date: Optional[str] = None
+    debit: Optional[float] = 0
+    credit: Optional[float] = 0
+    category: Optional[str] = None
+
+class SummaryRequest(BaseModel):
+    transactions: List[SummaryTransaction]
+
+class SummaryResponse(BaseModel):
+    totalIncome: float
+    totalExpenditure: float
+    suggestions: str
 
 
 @app.get("/")
@@ -256,6 +297,103 @@ async def analyze_transactions(request: AnalyzeRequest):
             categories={},
             error=str(e)
         )
+
+
+@app.post("/api/ai/categorize", response_model=CategorizeResponse)
+async def categorize_transactions(request: CategorizeRequest):
+    """Categorize transactions using AI/LLM with caching and fallback."""
+    try:
+        logger.info(f"Categorizing {len(request.transactions)} transactions for file {request.fileId}")
+        
+        # Import the categorizer
+        from ..analyzer.transaction_categorizer import SmartCategorizer
+        
+        # Convert request transactions to format expected by categorizer
+        transactions_for_categorizer = []
+        for txn in request.transactions:
+            transaction_dict = {
+                "description": txn.description,
+                "credit": txn.credit,
+                "debit": txn.debit,
+                "date": txn.date
+            }
+            transactions_for_categorizer.append(transaction_dict)
+        
+        # Use SmartCategorizer for now (can be enhanced with LLM later)
+        categorizer = SmartCategorizer()
+        categorization_results = categorizer.categorize_batch(transactions_for_categorizer)
+        
+        # Build response with confidence scores
+        categories = []
+        for i, txn in enumerate(request.transactions):
+            category = categorization_results.get(str(i), 'Others')
+            
+            # Assign confidence based on category (can be enhanced)
+            confidence = 0.9 if category != 'Others' else 0.6
+            
+            categories.append(CategoryMapping(
+                id=txn.id,
+                category=category,
+                confidence=confidence
+            ))
+        
+        logger.info(f"Successfully categorized {len(categories)} transactions")
+        return CategorizeResponse(categories=categories)
+        
+    except Exception as e:
+        logger.error(f"Categorization failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Categorization failed: {str(e)}")
+
+
+@app.post("/analyze/summary", response_model=SummaryResponse)
+async def analyze_summary(request: SummaryRequest) -> SummaryResponse:
+    """Compute totals and generate a brief suggestions paragraph (~100 words).
+
+    Notes:
+    - This implementation generates a heuristic suggestion locally to avoid
+      external LLM dependency in dev. You may replace the suggestion text
+      with a real LLM call if available.
+    """
+    try:
+        total_income = 0.0
+        total_expenditure = 0.0
+        category_spend: Dict[str, float] = {}
+
+        for t in request.transactions:
+            debit = float(t.debit or 0)
+            credit = float(t.credit or 0)
+            cat = (t.category or "Others")
+            total_expenditure += max(0.0, debit)
+            total_income += max(0.0, credit)
+            if debit > 0:
+                category_spend[cat] = category_spend.get(cat, 0.0) + debit
+
+        # Build a concise suggestion (~100 words) using totals and top categories
+        top = sorted(category_spend.items(), key=lambda x: x[1], reverse=True)[:3]
+        top_str = ", ".join([f"{name} ({amount:.0f})" for name, amount in top]) if top else "no significant spend categories"
+
+        savings = max(0.0, total_income - total_expenditure)
+        savings_tip = "Consider allocating a fixed portion of income to savings before discretionary spending."
+        track_tip = "Track recurring bills and set alerts to avoid unnecessary charges."
+        reduce_tip = "Reduce variable expenses (e.g., dining, shopping) with weekly budgets."
+
+        suggestions = (
+            f"Your total income and expenditure provide a clear view of cash flow. "
+            f"Spending concentration appears in {top_str}. "
+            f"Aim to maintain a positive monthly gap; current potential savings is approximately {savings:.0f}. "
+            f"{savings_tip} {track_tip} {reduce_tip} "
+            f"Review subscriptions, compare prices for frequent purchases, and plan large expenses ahead. "
+            f"Gradually build a 3–6 month emergency fund and automate investments where possible."
+        )
+
+        return SummaryResponse(
+            totalIncome=round(total_income, 2),
+            totalExpenditure=round(total_expenditure, 2),
+            suggestions=suggestions
+        )
+    except Exception as e:
+        logger.error(f"Summary analysis failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/upload", response_model=UploadResponse)

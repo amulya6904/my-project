@@ -9,6 +9,7 @@ import logging
 from fastapi import FastAPI, UploadFile, File, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 # Import the working parsers from the CLI
 from ..parsers.parser_factory import ParserFactory
@@ -38,7 +39,12 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -47,6 +53,21 @@ app.add_middleware(
 # Maximum file size (50MB)
 MAX_FILE_SIZE = 50 * 1024 * 1024
 
+
+# Models for summary endpoint
+class SummaryTransaction(BaseModel):
+    date: Optional[str] = None
+    debit: Optional[float] = 0
+    credit: Optional[float] = 0
+    category: Optional[str] = None
+
+class SummaryRequest(BaseModel):
+    transactions: List[SummaryTransaction]
+
+class SummaryResponse(BaseModel):
+    totalIncome: float
+    totalExpenditure: float
+    suggestions: str
 
 @app.get("/")
 async def root():
@@ -67,6 +88,44 @@ async def root():
 async def health_check():
     """Health check endpoint."""
     return {"status": "healthy", "message": "API is running"}
+
+
+@app.post("/analyze/summary")
+async def analyze_summary(request: SummaryRequest) -> SummaryResponse:
+    """Compute totals and generate a brief suggestions paragraph (~100 words)."""
+    try:
+        total_income = 0.0
+        total_expenditure = 0.0
+        category_spend: Dict[str, float] = {}
+
+        for t in request.transactions:
+            debit = float(t.debit or 0)
+            credit = float(t.credit or 0)
+            cat = (t.category or "Others")
+            total_expenditure += max(0.0, debit)
+            total_income += max(0.0, credit)
+            if debit > 0:
+                category_spend[cat] = category_spend.get(cat, 0.0) + debit
+
+        top = sorted(category_spend.items(), key=lambda x: x[1], reverse=True)[:3]
+        top_str = ", ".join([f"{name} ({amount:.0f})" for name, amount in top]) if top else "no significant spend categories"
+
+        savings = max(0.0, total_income - total_expenditure)
+        suggestions = (
+            f"Income and spending trends show key outflows in {top_str}. "
+            f"Preserve a monthly surplus (approx {savings:.0f}) by tightening variable spends, "
+            f"auditing subscriptions, and setting category caps. Automate savings, build an emergency fund, "
+            f"and plan purchases to avoid impulse buys. Use reminders for bills and compare providers to lower costs."
+        )
+
+        return SummaryResponse(
+            totalIncome=round(total_income, 2),
+            totalExpenditure=round(total_expenditure, 2),
+            suggestions=suggestions
+        )
+    except Exception as e:
+        logger.error(f"Summary analysis failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/api/upload")

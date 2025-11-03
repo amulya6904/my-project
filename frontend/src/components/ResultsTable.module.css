@@ -35,6 +35,48 @@
   color: #666;
 }
 
+.headerActions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.analyzeBtn {
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.analyzeBtn:hover:not(:disabled) {
+  background: #5855eb;
+}
+
+.analyzeBtn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.analyzeBtn.loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.downloadGroup {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 .downloadBtn {
   background: #28a745;
   color: white;
@@ -48,6 +90,22 @@
 
 .downloadBtn:hover {
   background: #218838;
+}
+
+.downloadEnhancedBtn {
+  background: #17a2b8;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.downloadEnhancedBtn:hover {
+  background: #138496;
 }
 
 .tableContainer {
@@ -158,6 +216,118 @@
 .typeBadge.fee {
   background: #fff3e0;
   color: #f57c00;
+}
+
+/* AI Category Styles */
+.aiCategory {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.categoryBadge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  color: white;
+  background: #9ca3af;
+}
+
+.categoryBadge.income {
+  background: #22c55e;
+}
+
+.categoryBadge.shopping {
+  background: #3b82f6;
+}
+
+.categoryBadge.dining {
+  background: #f59e0b;
+}
+
+.categoryBadge.transportation {
+  background: #8b5cf6;
+}
+
+.categoryBadge.rent {
+  background: #ef4444;
+}
+
+.categoryBadge.utilities {
+  background: #06b6d4;
+}
+
+.categoryBadge.entertainment {
+  background: #ec4899;
+}
+
+.categoryBadge.groceries {
+  background: #84cc16;
+}
+
+.categoryBadge.fees {
+  background: #f97316;
+}
+
+.categoryBadge.transfers {
+  background: #6b7280;
+}
+
+.categoryBadge.others {
+  background: #9ca3af;
+}
+
+.categoryBadge.lowConfidence {
+  opacity: 0.7;
+  border: 1px dashed rgba(255, 255, 255, 0.5);
+}
+
+.categoryBadge.manualCategory {
+  border: 2px solid #22c55e;
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.2);
+  font-weight: 600;
+}
+
+.categoryDropdown {
+  background: #f8f9fa;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 80px;
+  text-align: center;
+}
+
+.categoryDropdown:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.categoryDropdown:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.categorySkeleton {
+  width: 60px;
+  height: 20px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 10px;
+  margin: 0 auto;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .pagination {

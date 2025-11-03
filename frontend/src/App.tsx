@@ -95,6 +95,7 @@ const App: React.FC = () => {
             transactions={processingResults.transactions}
             bankName={processingResults.bank}
             onDownload={handleDownload}
+            jobId={currentJob?.job_id}
           />
         );
 

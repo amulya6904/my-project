@@ -23,6 +23,7 @@ export interface JobStatusResponse {
 }
 
 export interface TransactionData {
+  id?: string;
   date: string;
   description: string;
   reference?: string;
